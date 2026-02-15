@@ -76,3 +76,14 @@ async def root():
 @app.get("/health")
 async def health_check():
     return {"status": "healthy"}
+
+@app.get("/api/get-ip")
+async def get_ip(request: Request):
+    # 从请求状态中获取用户信息，其中包含IP
+    if hasattr(request.state, "user"):
+        return {"ip": request.state.user.ip}
+    # 如果没有用户信息，尝试从请求中获取
+    ip = request.headers.get("X-Forwarded-For", request.client.host)
+    if "," in ip:
+        ip = ip.split(",")[0].strip()
+    return {"ip": ip}

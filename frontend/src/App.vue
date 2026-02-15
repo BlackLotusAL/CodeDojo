@@ -9,6 +9,21 @@
       class="ip-alert"
     />
     
+    <!-- 导航栏 -->
+    <el-menu
+      :default-active="activeMenu"
+      class="el-menu-demo"
+      mode="horizontal"
+      router
+      class="main-nav"
+    >
+      <el-menu-item index="/dashboard">仪表盘</el-menu-item>
+      <el-menu-item index="/question-bank">题库</el-menu-item>
+      <el-menu-item index="/exam">考试</el-menu-item>
+      <el-menu-item index="/wrong-book">错题本</el-menu-item>
+      <el-menu-item index="/rankings">排行榜</el-menu-item>
+    </el-menu>
+    
     <!-- 路由视图 -->
     <router-view v-slot="{ Component }">
       <transition name="fade" mode="out-in">
@@ -19,20 +34,34 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
+import { useRoute } from 'vue-router'
 import axios from 'axios'
 
+const route = useRoute()
 const userIp = ref('')
+
+// 计算当前激活的菜单
+const activeMenu = computed(() => {
+  return route.path
+})
 
 // 获取用户IP
 onMounted(async () => {
   try {
-    // 这里简化处理，实际项目中可以通过API获取
-    // 或者从后端返回的响应中获取
-    userIp.value = '127.0.0.1' // 模拟IP
+    // 尝试通过API获取用户真实IP
+    const response = await axios.get('/api/get-ip')
+    userIp.value = response.data.ip
   } catch (error) {
-    console.error('Failed to get user IP:', error)
-    userIp.value = 'Unknown'
+    console.error('Failed to get user IP from API, using fallback method:', error)
+    // 备用方案：使用第三方服务获取IP
+    try {
+      const response = await axios.get('https://api.ipify.org?format=json')
+      userIp.value = response.data.ip
+    } catch (fallbackError) {
+      console.error('Fallback method also failed, using default IP:', fallbackError)
+      userIp.value = '127.0.0.1' // 默认值
+    }
   }
 })
 </script>
@@ -50,6 +79,20 @@ onMounted(async () => {
   right: 0;
   z-index: 1000;
   margin: 0;
+}
+
+.main-nav {
+  position: fixed;
+  top: 60px;
+  left: 0;
+  right: 0;
+  z-index: 999;
+  background-color: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.app-container {
+  padding-top: 120px;
 }
 
 .fade-enter-active,
