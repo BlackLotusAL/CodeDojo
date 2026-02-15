@@ -44,18 +44,26 @@ cd ../frontend
 npm install
 npm run build
 
-# 9. 配置Nginx
+# 9. 配置前端文件目录
+echo "配置前端文件目录..."
+sudo mkdir -p /var/www/exam-system
+sudo cp -r dist/* /var/www/exam-system/
+sudo chown -R www-data:www-data /var/www/exam-system/
+
+# 10. 配置Nginx
 echo "配置Nginx..."
 sudo apt install -y nginx
+sudo rm -f /etc/nginx/sites-enabled/default
 sudo cp ../nginx.conf /etc/nginx/sites-available/exam-system
 sudo ln -sf /etc/nginx/sites-available/exam-system /etc/nginx/sites-enabled/
 
-# 10. 配置systemd服务
+
+# 11. 配置systemd服务
 echo "配置systemd服务..."
 sudo cp ../exam-backend.service /etc/systemd/system/
 sudo systemctl daemon-reload
 
-# 11. 重启服务
+# 12. 重启服务
 echo "重启服务..."
 sudo systemctl restart nginx
 sudo systemctl restart exam-backend.service
