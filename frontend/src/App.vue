@@ -12,10 +12,9 @@
     <!-- 导航栏 -->
     <el-menu
       :default-active="activeMenu"
-      class="el-menu-demo"
+      class="el-menu-demo main-nav"
       mode="horizontal"
       router
-      class="main-nav"
     >
       <el-menu-item index="/dashboard">仪表盘</el-menu-item>
       <el-menu-item index="/question-bank">题库</el-menu-item>
