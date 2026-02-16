@@ -68,7 +68,7 @@ onMounted(async () => {
 <style scoped>
 .app-container {
   min-height: 100vh;
-  padding-top: 60px;
+  padding-top: 110px;
 }
 
 .ip-alert {
@@ -78,20 +78,20 @@ onMounted(async () => {
   right: 0;
   z-index: 1000;
   margin: 0;
+  border-radius: 0;
 }
 
 .main-nav {
   position: fixed;
-  top: 60px;
+  top: 50px;
   left: 0;
   right: 0;
   z-index: 999;
   background-color: #ffffff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.app-container {
-  padding-top: 120px;
+  margin: 0;
+  border-radius: 0;
+  min-height: 60px;
 }
 
 .fade-enter-active,
