@@ -21,9 +21,9 @@ async def get_rankings(
         AnswerRecord.user_ip,
         func.sum(
             case(
-                [(Question.type == "subjective", 5),
-                 (AnswerRecord.is_correct == True, 10),
-                 (AnswerRecord.is_correct == False, -2)],
+                (Question.type == "subjective", 5),
+                (AnswerRecord.is_correct == True, 10),
+                (AnswerRecord.is_correct == False, -2),
                 else_=0
             )
         ).label("total_score")
