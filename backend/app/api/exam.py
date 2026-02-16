@@ -86,7 +86,7 @@ async def start_exam(request: Request, exam_data: ExamStartRequest):
 async def save_answer(
     request: Request,
     session_id: str = Path(..., description="考试会话ID"),
-    answer_data: AnswerRequest
+    answer_data: AnswerRequest,
 ):
     user = request.state.user
     db = request.state.db
