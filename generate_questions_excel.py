@@ -1,0 +1,80 @@
+#!/usr/bin/env python3
+
+import openpyxl
+from openpyxl.utils import get_column_letter
+
+# 创建一个新的工作簿
+workbook = openpyxl.Workbook()
+worksheet = workbook.active
+worksheet.title = "Questions"
+
+# 设置表头
+headers = ["level", "subject", "type", "content", "options", "answer", "explanation"]
+for col, header in enumerate(headers, 1):
+    worksheet[get_column_letter(col) + "1"] = header
+
+# 示例题目数据
+questions = [
+    # 入门级 - 算法基础
+    ["entry", "1", "single", "以下哪个是Python中的内置数据类型？", '{"A":"Array","B":"List","C":"HashTable","D":"Map"}', "B", "Python中的内置数据类型包括List，而Array、HashTable、Map都不是内置类型"],
+    ["entry", "1", "judge", "Python中的列表是可变的数据类型。", '{"A":"正确","B":"错误"}', "A", "Python中的列表(list)是可变的数据类型，可以通过索引修改元素"],
+    
+    # 入门级 - 编程语言
+    ["entry", "2", "single", "以下哪个是JavaScript中的闭包？", '{"A":"一个函数返回另一个函数","B":"一个函数调用自身","C":"一个函数接收另一个函数作为参数","D":"一个函数没有参数"}', "A", "闭包是指有权访问另一个函数作用域中变量的函数，通常是一个函数返回另一个函数"],
+    ["entry", "2", "multiple", "以下哪些是JavaScript中的基本数据类型？", '{"A":"String","B":"Number","C":"Object","D":"Boolean"}', "ABD", "JavaScript中的基本数据类型包括String、Number、Boolean、Null、Undefined、Symbol、BigInt，Object是引用类型"],
+    
+    # 入门级 - 标准规范
+    ["entry", "3", "single", "在HTTP协议中，以下哪个状态码表示请求成功？", '{"A":"404","B":"500","C":"200","D":"403"}', "C", "HTTP 200状态码表示请求成功，404表示资源未找到，500表示服务器内部错误，403表示禁止访问"],
+    ["entry", "3", "judge", "RESTful API中，GET请求可以修改服务器端资源。", '{"A":"正确","B":"错误"}', "B", "RESTful API中，GET请求应该是幂等的，不应该修改服务器端资源"],
+    
+    # 入门级 - 设计模式
+    ["entry", "4", "single", "以下哪个设计模式属于创建型模式？", '{"A":"单例模式","B":"适配器模式","C":"观察者模式","D":"策略模式"}', "A", "单例模式属于创建型模式，适配器模式属于结构型模式，观察者模式和策略模式属于行为型模式"],
+    ["entry", "4", "multiple", "以下哪些是SOLID原则的内容？", '{"A":"单一职责原则","B":"开放封闭原则","C":"里氏替换原则","D":"依赖倒置原则"}', "ABCD", "SOLID原则包括：单一职责原则(S)、开放封闭原则(O)、里氏替换原则(L)、接口隔离原则(I)、依赖倒置原则(D)"],
+    
+    # 工作级 - 算法基础
+    ["work", "1", "single", "以下哪个排序算法的时间复杂度在最坏情况下是O(n^2)？", '{"A":"快速排序","B":"归并排序","C":"堆排序","D":"基数排序"}', "A", "快速排序在最坏情况下的时间复杂度是O(n^2)，归并排序和堆排序是O(nlogn)，基数排序是O(nk)"],
+    ["work", "1", "multiple", "以下哪些算法可以用于查找最短路径？", '{"A":"Dijkstra算法","B":"Floyd-Warshall算法","C":"Prim算法","D":"Kruskal算法"}', "AB", "Dijkstra算法和Floyd-Warshall算法可以用于查找最短路径，Prim算法和Kruskal算法用于最小生成树"],
+    
+    # 工作级 - 编程语言
+    ["work", "2", "single", "在Java中，以下哪个关键字用于创建对象？", '{"A":"new","B":"create","C":"make","D":"instance"}', "A", "在Java中，使用new关键字创建对象"],
+    ["work", "2", "judge", "Java中的String类是可变的。", '{"A":"正确","B":"错误"}', "B", "Java中的String类是不可变的，每次修改都会创建新的String对象"],
+    
+    # 工作级 - 标准规范
+    ["work", "3", "single", "以下哪个是SQL中的聚合函数？", '{"A":"SELECT","B":"FROM","C":"SUM","D":"WHERE"}', "C", "SUM是SQL中的聚合函数，用于计算总和，其他选项都是SQL语句的关键字"],
+    ["work", "3", "multiple", "以下哪些是SQL中的约束？", '{"A":"PRIMARY KEY","B":"FOREIGN KEY","C":"UNIQUE","D":"NOT NULL"}', "ABCD", "这些都是SQL中的约束，用于保证数据的完整性和一致性"],
+    
+    # 工作级 - 设计模式
+    ["work", "4", "single", "以下哪个设计模式用于处理对象间的一对多依赖关系？", '{"A":"单例模式","B":"观察者模式","C":"工厂模式","D":"装饰器模式"}', "B", "观察者模式用于处理对象间的一对多依赖关系，当一个对象状态改变时，所有依赖它的对象都会得到通知"],
+    ["work", "4", "judge", "装饰器模式允许在不修改原有对象结构的情况下，动态地给对象添加额外的责任。", '{"A":"正确","B":"错误"}', "A", "装饰器模式的核心思想就是在不修改原有对象结构的情况下，动态地给对象添加额外的责任"],
+    
+    # 专业级 - 算法基础
+    ["pro", "1", "single", "以下哪个算法用于解决0-1背包问题？", '{"A":"贪心算法","B":"动态规划","C":"回溯算法","D":"分支限界算法"}', "B", "0-1背包问题通常使用动态规划算法解决，贪心算法不能得到最优解"],
+    ["pro", "1", "multiple", "以下哪些是NP完全问题？", '{"A":"旅行商问题","B":"背包问题","C":"排序问题","D":"图的着色问题"}', "ABD", "旅行商问题、背包问题、图的着色问题都是NP完全问题，排序问题是P问题"],
+    
+    # 专业级 - 编程语言
+    ["pro", "2", "single", "在C++中，以下哪个关键字用于定义常量？", '{"A":"const","B":"static","C":"final","D":"immutable"}', "A", "在C++中，使用const关键字定义常量"],
+    ["pro", "2", "judge", "C++中的虚函数是通过虚函数表实现的。", '{"A":"正确","B":"错误"}', "A", "C++中的虚函数是通过虚函数表(vtable)实现的，每个包含虚函数的类都有一个虚函数表"],
+    
+    # 专业级 - 标准规范
+    ["pro", "3", "single", "以下哪个是NoSQL数据库？", '{"A":"MySQL","B":"PostgreSQL","C":"MongoDB","D":"Oracle"}', "C", "MongoDB是NoSQL数据库，其他选项都是关系型数据库"],
+    ["pro", "3", "multiple", "以下哪些是分布式系统的特性？", '{"A":"一致性","B":"可用性","C":"分区容错性","D":"原子性"}', "ABC", "分布式系统的CAP理论包括一致性(Consistency)、可用性(Availability)、分区容错性(Partition tolerance)"],
+    
+    # 专业级 - 设计模式
+    ["pro", "4", "single", "以下哪个架构模式是基于服务的架构？", '{"A":"MVC","B":"微服务","C":"MVP","D":"MVVM"}', "B", "微服务是基于服务的架构，将应用拆分为多个独立的服务"],
+    ["pro", "4", "subjective", "请简述RESTful API的设计原则。", "", "1. 资源标识：使用URI标识资源\n2. 统一接口：使用标准的HTTP方法\n3. 无状态：服务器不保存客户端状态\n4. 缓存：支持缓存以提高性能\n5. 分层系统：支持分层架构\n6. 按需编码：允许客户端下载并执行服务器代码（可选）", "RESTful API的设计原则包括资源标识、统一接口、无状态、缓存、分层系统和按需编码等"]
+]
+
+# 写入题目数据
+for row, question in enumerate(questions, 2):
+    for col, value in enumerate(question, 1):
+        worksheet[get_column_letter(col) + str(row)] = value
+
+# 调整列宽
+for col in range(1, len(headers) + 1):
+    worksheet.column_dimensions[get_column_letter(col)].auto_size = True
+
+# 保存工作簿
+excel_path = "/root/CodeDojo/docs/questions_template.xlsx"
+workbook.save(excel_path)
+print(f"示例题库Excel文件已生成：{excel_path}")
+print(f"文件包含 {len(questions)} 道题目")
