@@ -251,11 +251,82 @@ ls -la alembic/versions/
 ## 9. 管理端功能
 
 ### 9.1 批量导入题目
-- 访问`/api/admin/questions/import`接口
-- 上传Excel文件，格式如下：
-  | level | subject | type | content | options | answer | explanation |
-  |-------|---------|------|---------|---------|--------|-------------|
-  | entry | 1 | single | 题目内容 | {"A":"选项A","B":"选项B"} | A | 解析 |
+
+#### 9.1.1 题目Excel模板格式
+
+题目导入需要使用Excel文件（.xlsx格式），模板格式如下：
+
+| 列名 | 说明 | 示例值 | 备注 |
+|------|------|--------|------|
+| level | 难度级别 | entry | 可选值：entry（入门）、work（工作）、pro（专业） |
+| subject | 科目代码 | 1 | 1：算法基础（科一）、2：编程语言（科二）、3：标准规范（科三）、4：设计模式（科四） |
+| type | 题目类型 | single | 可选值：single（单选题）、multiple（多选题）、judge（判断题）、subjective（主观题） |
+| content | 题目内容 | 以下哪个是Python中的内置数据类型？ | 题目描述文本 |
+| options | 选项 | {"A":"Array","B":"List","C":"HashTable","D":"Map"} | JSON格式字符串，只适用于选择题和判断题 |
+| answer | 答案 | B | 选择题：A/B/C/D；多选题：ABD；判断题：A（正确）/B（错误）；主观题：文本答案 |
+| explanation | 解析 | Python中的内置数据类型包括List... | 题目解析说明 |
+
+#### 9.1.2 示例题目
+
+以下是一些示例题目：
+
+| level | subject | type | content | options | answer | explanation |
+|-------|---------|------|---------|---------|--------|-------------|
+| entry | 1 | single | 以下哪个是Python中的内置数据类型？ | {"A":"Array","B":"List","C":"HashTable","D":"Map"} | B | Python中的内置数据类型包括List，而Array、HashTable、Map都不是内置类型 |
+| entry | 2 | multiple | 以下哪些是JavaScript中的基本数据类型？ | {"A":"String","B":"Number","C":"Object","D":"Boolean"} | ABD | JavaScript中的基本数据类型包括String、Number、Boolean、Null、Undefined、Symbol、BigInt，Object是引用类型 |
+| entry | 3 | judge | RESTful API中，GET请求可以修改服务器端资源。 | {"A":"正确","B":"错误"} | B | RESTful API中，GET请求应该是幂等的，不应该修改服务器端资源 |
+| entry | 4 | subjective | 请简述RESTful API的设计原则。 | | 1. 资源标识：使用URI标识资源<br>2. 统一接口：使用标准的HTTP方法<br>3. 无状态：服务器不保存客户端状态<br>4. 缓存：支持缓存以提高性能<br>5. 分层系统：支持分层架构<br>6. 按需编码：允许客户端下载并执行服务器代码（可选） | RESTful API的设计原则包括资源标识、统一接口、无状态、缓存、分层系统和按需编码等 |
+
+#### 9.1.3 上传步骤
+
+1. **准备Excel文件**
+   - 使用模板格式创建Excel文件
+   - 填写题目数据
+   - 保存为.xlsx格式
+
+2. **上传题目**
+   - 使用POST请求访问`/api/admin/questions/import`接口
+   - 以multipart/form-data格式上传Excel文件
+   - 字段名：`file`
+
+3. **上传工具**
+   - 使用Postman：选择POST方法，设置URL为`http://服务器IP/api/admin/questions/import`，在Body选项卡中选择form-data，添加key为`file`，类型选择File，然后选择Excel文件
+   - 使用curl命令：
+     ```bash
+     curl -X POST "http://服务器IP/api/admin/questions/import" \
+          -H "Content-Type: multipart/form-data" \
+          -F "file=@questions_template.xlsx"
+     ```
+
+4. **上传结果**
+   - 成功响应示例：
+     ```json
+     {
+       "imported_count": 10,
+       "failed_count": 0,
+       "failed_questions": []
+     }
+     ```
+   - 失败响应示例：
+     ```json
+     {
+       "imported_count": 8,
+       "failed_count": 2,
+       "failed_questions": [
+         "Row 5: Invalid level-subject combination",
+         "Row 10: 'NoneType' object has no attribute 'strip'"
+       ]
+     }
+     ```
+
+#### 9.1.4 注意事项
+
+- 只有管理员IP可以访问此接口（在exam-backend.service中配置ADMIN_IPS）
+- 算法基础（科一）不参与排行榜计算
+- 题目ID会自动生成，格式为：[EN/WK/PR]-[科目代码]-[序号]
+- 上传时会检查level-subject组合的合法性
+- 选择题和判断题必须提供options字段
+- 主观题不需要options字段
 
 ### 9.2 数据迁移
 - 访问`/api/admin/migrate`接口
