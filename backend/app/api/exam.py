@@ -85,8 +85,8 @@ async def start_exam(request: Request, exam_data: ExamStartRequest):
 @router.post("/exam/{session_id}/answer")
 async def save_answer(
     request: Request,
-    session_id: str = Path(..., description="考试会话ID"),
     answer_data: AnswerRequest,
+    session_id: str = Path(..., description="考试会话ID"),
 ):
     user = request.state.user
     db = request.state.db
