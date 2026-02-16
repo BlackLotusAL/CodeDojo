@@ -40,6 +40,9 @@ async def import_questions(request: Request, file: UploadFile = File(...)):
     failed_count = 0
     failed_questions = []
     
+    # 预计算每个级别-科目组合的当前最大序号
+    sequence_cache = {}
+    
     # 假设Excel表头：level, subject, type, content, options, answer, explanation
     for row in worksheet.iter_rows(min_row=2, values_only=True):
         try:
@@ -65,12 +68,29 @@ async def import_questions(request: Request, file: UploadFile = File(...)):
             }[level]
             
             subject_prefix = f"{subject.value:03d}"
+            cache_key = f"{level_prefix}-{subject_prefix}"
             
             # 计算序号
-            existing_count = db.query(Question).filter(
-                Question.id.like(f"{level_prefix}-{subject_prefix}-%")
-            ).count()
-            serial_number = existing_count + 1
+            if cache_key not in sequence_cache:
+                # 查询数据库获取当前最大序号
+                existing_questions = db.query(Question).filter(
+                    Question.id.like(f"{level_prefix}-{subject_prefix}-%")
+                ).all()
+                
+                max_seq = 0
+                for q in existing_questions:
+                    try:
+                        seq = int(q.id.split('-')[2])
+                        if seq > max_seq:
+                            max_seq = seq
+                    except:
+                        pass
+                
+                sequence_cache[cache_key] = max_seq
+            
+            # 递增序号
+            sequence_cache[cache_key] += 1
+            serial_number = sequence_cache[cache_key]
             question_id = f"{level_prefix}-{subject_prefix}-{serial_number:03d}"
             
             # 处理选项
