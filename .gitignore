@@ -15,9 +15,12 @@ build/
 *.log
 
 # 缓存文件
-__pycache__/
+**/__pycache__/
 *.pyc
 *.pyo
+
+# 虚拟环境
+venv/
 
 # IDE配置
 .vscode/
