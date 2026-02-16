@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Request, Query
-from sqlalchemy import func, distinct
+from sqlalchemy import func, distinct, case
 from typing import Optional
 
 from app.models import User, AnswerRecord, Question, LevelEnum, SubjectEnum
@@ -20,13 +20,11 @@ async def get_rankings(
     score_query = db.query(
         AnswerRecord.user_ip,
         func.sum(
-            func.case(
-                (
-                    (Question.type == "subjective", 5),
-                    (AnswerRecord.is_correct == True, 10),
-                    (AnswerRecord.is_correct == False, -2),
-                    (True, 0)  # 默认值
-                )
+            case(
+                [(Question.type == "subjective", 5),
+                 (AnswerRecord.is_correct == True, 10),
+                 (AnswerRecord.is_correct == False, -2)],
+                else_=0
             )
         ).label("total_score")
     ).join(
