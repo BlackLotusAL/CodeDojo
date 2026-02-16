@@ -25,9 +25,15 @@ app.add_middleware(
 @app.middleware("http")
 async def user_middleware(request: Request, call_next):
     # 提取IP
-    ip = request.headers.get("X-Forwarded-For", request.client.host)
-    if "," in ip:
-        ip = ip.split(",")[0].strip()
+    if request.client:
+        ip = request.headers.get("X-Forwarded-For", request.client.host)
+        if "," in ip:
+            ip = ip.split(",")[0].strip()
+    else:
+        # 当request.client为None时，使用默认IP
+        ip = request.headers.get("X-Forwarded-For", "127.0.0.1")
+        if "," in ip:
+            ip = ip.split(",")[0].strip()
     
     # 白名单检查（如果配置）
     ip_whitelist = os.getenv("IP_WHITELIST")
