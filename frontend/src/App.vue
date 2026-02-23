@@ -79,6 +79,10 @@ onMounted(async () => {
   z-index: 1000;
   margin: 0;
   border-radius: 0;
+  border: none;
+  height: 50px;
+  display: flex;
+  align-items: center;
 }
 
 .main-nav {
@@ -91,7 +95,9 @@ onMounted(async () => {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   margin: 0;
   border-radius: 0;
+  border: none;
   min-height: 60px;
+  padding: 0;
 }
 
 .fade-enter-active,
