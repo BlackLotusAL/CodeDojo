@@ -67,7 +67,7 @@ onMounted(async () => {
 
 <style scoped>
 .app-container {
-  min-height: 100vh;
+  height: auto;
   padding-top: 110px;
 }
 
