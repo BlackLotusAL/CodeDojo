@@ -61,18 +61,25 @@
         <!-- 题号导航 -->
         <div class="question-nav">
           <h3>题号导航</h3>
-          <el-button-group class="question-buttons">
-            <el-button
+          <div class="question-boxes">
+            <div
               v-for="(question, index) in examQuestions"
               :key="question.id"
-              :type="getQuestionButtonType(index)"
-              :plain="currentQuestionIndex === index"
-              :icon="getQuestionButtonIcon(index)"
+              class="question-box"
+              :class="{
+                'current': currentQuestionIndex === index,
+                'answered': userAnswers.value[index],
+                'uncertain': uncertainQuestions.value[index]
+              }"
               @click="goToQuestion(index)"
             >
-              {{ index + 1 }}
-            </el-button>
-          </el-button-group>
+              <span class="question-number">{{ index + 1 }}</span>
+              <span class="question-status">
+                <span v-if="userAnswers.value[index]" class="status-dot answered-dot"></span>
+                <span v-else-if="uncertainQuestions.value[index]" class="status-dot uncertain-dot"></span>
+              </span>
+            </div>
+          </div>
         </div>
       </el-aside>
       
@@ -272,6 +279,12 @@ const handleStartExam = async () => {
         
         // 初始化用户答案
         userAnswers.value = new Array(examQuestions.value.length).fill('')
+        // 为多选题初始化空数组
+        for (let i = 0; i < examQuestions.value.length; i++) {
+          if (examQuestions.value[i].type === 'multiple') {
+            userAnswers.value[i] = []
+          }
+        }
         uncertainQuestions.value = new Array(examQuestions.value.length).fill(false)
         
         // 开始倒计时
@@ -300,9 +313,10 @@ const startTimer = () => {
 
 // 格式化倒计时
 const formatCountdown = (value) => {
-  const minutes = Math.floor(value / 60)
+  const hours = Math.floor(value / 3600)
+  const minutes = Math.floor((value % 3600) / 60)
   const seconds = value % 60
-  return `${minutes}分${seconds}秒`
+  return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
 }
 
 // 获取当前题目
@@ -496,20 +510,66 @@ onUnmounted(() => {
   margin-top: 30px;
 }
 
-.question-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
+.question-boxes {
   margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.question-buttons .el-button {
-  width: 40px;
-  height: 40px;
-  padding: 0;
+.question-box {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
+  padding: 12px;
+  border-radius: 6px;
+  background-color: #ffffff;
+  border: 1px solid #e4e7ed;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.question-box:hover {
+  border-color: #409eff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.question-box.current {
+  background-color: #ecf5ff;
+  border-color: #409eff;
+  box-shadow: 0 2px 8px rgba(64, 158, 255, 0.3);
+}
+
+.question-box.answered {
+  border-left: 4px solid #67c23a;
+}
+
+.question-box.uncertain {
+  border-left: 4px solid #e6a23c;
+}
+
+.question-number {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.question-status {
+  display: flex;
+  gap: 4px;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.status-dot.answered-dot {
+  background-color: #67c23a;
+}
+
+.status-dot.uncertain-dot {
+  background-color: #e6a23c;
 }
 
 .exam-main {
@@ -541,9 +601,39 @@ onUnmounted(() => {
 }
 
 .action-section {
-  margin-top: 30px;
+  margin-top: 40px;
   display: flex;
-  justify-content: space-between;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e4e7ed;
+}
+
+.action-section .el-button {
+  padding: 12px 24px;
+  font-size: 16px;
+  border-radius: 6px;
+  min-width: 120px;
+  transition: all 0.3s ease;
+}
+
+.action-section .el-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.action-section .el-button--danger {
+  background-color: #f56c6c;
+  border-color: #f56c6c;
+  font-weight: 600;
+  min-width: 140px;
+}
+
+.action-section .el-button--primary {
+  font-weight: 600;
 }
 
 .exam-result {
