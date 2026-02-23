@@ -45,11 +45,12 @@ async def user_middleware(request: Request, call_next):
     # 自动创建用户记录
     db = next(get_db())
     user = db.query(User).filter(User.ip == ip).first()
+    
+    # 检查是否为管理员IP
+    admin_ips = os.getenv("ADMIN_IPS", "").split(",")
+    is_admin = ip in [admin_ip.strip() for admin_ip in admin_ips if admin_ip.strip()]
+    
     if not user:
-        # 检查是否为管理员IP
-        admin_ips = os.getenv("ADMIN_IPS", "").split(",")
-        is_admin = ip in [admin_ip.strip() for admin_ip in admin_ips if admin_ip.strip()]
-        
         user = User(
             ip=ip,
             nickname=f"User_{ip.replace('.', '_')}",
@@ -59,6 +60,12 @@ async def user_middleware(request: Request, call_next):
         db.add(user)
         db.commit()
         db.refresh(user)
+    else:
+        # 如果用户已存在，更新管理员状态
+        if user.is_admin != is_admin:
+            user.is_admin = is_admin
+            db.commit()
+            db.refresh(user)
     
     # 注入请求上下文
     request.state.user = user
